@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://dnronxr4e0kl6"]
+
+[sub_resource type="GDScript" id="GDScript_rf3rd"]
+script/source = "extends Node2D
+const favela = preload(\"uid://nwyvi1ou8xw0\")
+
+func _on_server_pressed() -> void:
+	var fav = favela.instantiate()
+	get_parent().add_child(fav)
+	fav.create_server()
+	queue_free()
+
+func _on_client_pressed():
+	var fav = favela.instantiate()
+	get_parent().add_child(fav)
+	fav.join()
+	queue_free()
+"
+
+[node name="Node2D" type="Node2D" unique_id=654692774]
+script = SubResource("GDScript_rf3rd")
+
+[node name="Server" type="Button" parent="." unique_id=1019007144]
+offset_left = -1.0
+offset_top = 69.0
+offset_right = 111.0
+offset_bottom = 100.0
+text = "Create server"
+
+[node name="Join" type="Button" parent="." unique_id=1730541875]
+offset_left = 1.0
+offset_top = 108.0
+offset_right = 59.0
+offset_bottom = 143.0
+text = "Join"
+
+[node name="LineEdit" type="LineEdit" parent="." unique_id=1948672126]
+offset_left = 1.0
+offset_top = 29.0
+offset_right = 69.5
+offset_bottom = 60.0
+text = "135"
+
+[connection signal="pressed" from="Server" to="." method="_on_server_pressed"]
+[connection signal="pressed" from="Join" to="." method="_on_client_pressed"]

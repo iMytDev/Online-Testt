@@ -1,0 +1,121 @@
+[gd_scene format=3 uid="uid://nwyvi1ou8xw0"]
+
+[ext_resource type="PackedScene" uid="uid://cjdoiee3t2rwm" path="res://models/house/slum_house.glb" id="1_apv73"]
+[ext_resource type="AudioStream" uid="uid://cly5tqagpyige" path="res://Forró boys Nenem Do Pai.mp3" id="2_6yuad"]
+[ext_resource type="PackedScene" uid="uid://be1k8bqatvekm" path="res://scenes/player.tscn" id="3_q6pnf"]
+
+[sub_resource type="GDScript" id="GDScript_q6pnf"]
+script/source = "extends Node3D
+var peer = ENetMultiplayerPeer.new()
+
+var players: Dictionary
+@export var player_scene: PackedScene
+func create_server():
+	peer.create_server(135)
+	multiplayer.multiplayer_peer = peer
+	peer.peer_connected.connect(_add_player)
+	peer.peer_disconnected.connect(_remove_player)
+	_add_player(1)
+
+func join():
+	peer.create_client(\"localhost\",135)
+	multiplayer.multiplayer_peer = peer
+
+func _add_player(id):
+	var player = player_scene.instantiate()
+	player.name = str(id)
+	add_child.call_deferred(player)
+	players[id] = player
+
+func _remove_player(id): players[id].queue_free(); players.erase(id)
+"
+
+[sub_resource type="GDScript" id="GDScript_6yuad"]
+resource_name = "server"
+script/source = "extends Node
+
+var peer = ENetMultiplayerPeer.new()
+func _ready() -> void:
+	multiplayer.multiplayer_peer = peer
+func create_server(server_id):
+	peer.create_server(int(server_id))
+"
+
+[sub_resource type="Shader" id="Shader_q6pnf"]
+code = "shader_type sky;
+
+void sky() {
+	COLOR = mix(vec3(0.2,0.3,0.5),vec3(0.8,0.8,1.0),EYEDIR.y);
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_368ny"]
+shader = SubResource("Shader_q6pnf")
+
+[sub_resource type="Sky" id="Sky_r2mil"]
+sky_material = SubResource("ShaderMaterial_368ny")
+
+[sub_resource type="Environment" id="Environment_q6pnf"]
+background_mode = 2
+sky = SubResource("Sky_r2mil")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_q6pnf"]
+size = Vector3(56.12317, 0.001, 23.126953)
+
+[node name="favela" type="Node3D" unique_id=888322006]
+script = SubResource("GDScript_q6pnf")
+player_scene = ExtResource("3_q6pnf")
+
+[node name="Sketchfab_Scene" parent="." unique_id=1636562361 instance=ExtResource("1_apv73")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1857232, 0, -8.425335)
+
+[node name="Sketchfab_Scene2" parent="." unique_id=512669956 instance=ExtResource("1_apv73")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.200431, 0, -8.425335)
+
+[node name="Sketchfab_Scene3" parent="." unique_id=639440504 instance=ExtResource("1_apv73")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.569075, 0, -8.425335)
+script = SubResource("GDScript_6yuad")
+
+[node name="Sketchfab_Scene4" parent="." unique_id=1935952619 instance=ExtResource("1_apv73")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.959183, 0, -8.425335)
+
+[node name="Sketchfab_Scene5" parent="." unique_id=1821262328 instance=ExtResource("1_apv73")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.345337, 0, -8.425335)
+
+[node name="Sketchfab_Scene6" parent="." unique_id=623426057 instance=ExtResource("1_apv73")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45.71398, 0, -8.425335)
+
+[node name="Sketchfab_Scene7" parent="." unique_id=2102965080 instance=ExtResource("1_apv73")]
+transform = Transform3D(-1, 0, -0.000104816754, 0, 1, 0, 0.000104816754, 0, -1, 45.017906, 0, 6.8711853)
+
+[node name="Sketchfab_Scene8" parent="." unique_id=1613953277 instance=ExtResource("1_apv73")]
+transform = Transform3D(-1, 0, -0.000104816754, 0, 1, 0, 0.000104816754, 0, -1, 35.631752, 0, 6.8711853)
+
+[node name="Sketchfab_Scene9" parent="." unique_id=493942958 instance=ExtResource("1_apv73")]
+transform = Transform3D(-1, 0, -0.000104816754, 0, 1, 0, 0.000104816754, 0, -1, 26.263107, 0, 6.8711853)
+
+[node name="Sketchfab_Scene10" parent="." unique_id=1119840923 instance=ExtResource("1_apv73")]
+transform = Transform3D(-1, 0, -0.000104816754, 0, 1, 0, 0.000104816754, 0, -1, 16.873, 0, 6.8711853)
+
+[node name="Sketchfab_Scene11" parent="." unique_id=1508036968 instance=ExtResource("1_apv73")]
+transform = Transform3D(-1, 0, -0.000104816754, 0, 1, 0, 0.000104816754, 0, -1, 7.486845, 0, 6.8711853)
+
+[node name="Sketchfab_Scene12" parent="." unique_id=1409911620 instance=ExtResource("1_apv73")]
+transform = Transform3D(-1, 0, -0.000104816754, 0, 1, 0, 0.000104816754, 0, -1, -1.8817997, 0, 6.8711853)
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=1987318175]
+stream = ExtResource("2_6yuad")
+autoplay = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1519920802]
+environment = SubResource("Environment_q6pnf")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=874516146]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1560138188]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.44049, -0.52996254, 0)
+shape = SubResource("BoxShape3D_q6pnf")
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=2367426]
+_spawnable_scenes = PackedStringArray("uid://be1k8bqatvekm")
+spawn_path = NodePath("..")

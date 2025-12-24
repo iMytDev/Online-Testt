@@ -1,0 +1,85 @@
+[gd_scene format=3 uid="uid://be1k8bqatvekm"]
+
+[sub_resource type="GDScript" id="GDScript_u8vuu"]
+script/source = "extends CharacterBody3D
+
+
+const SPEED = 5.0
+const JUMP_VELOCITY = 4.5
+
+
+var sensibility: float = 5.0
+
+@onready var camera: Camera3D = $Camera3D
+func _enter_tree() -> void: _update_multiplayer_props()
+
+func _ready() -> void: 
+	set_multiplayer_authority(name.to_int())
+	_update_multiplayer_props()
+
+func _update_multiplayer_props():
+	if !is_node_ready(): return
+	if is_multiplayer_authority(): 
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		camera.current = true
+		set_process_input(true)
+	else:
+		camera.current = false
+		set_process_input(false)
+
+func _exit_tree() -> void: Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+func _physics_process(delta: float) -> void:
+	if !is_multiplayer_authority(): return
+	# Add the gravity.
+	if !is_on_floor(): velocity += get_gravity() * delta
+
+	# Handle jump.
+	if Input.is_action_just_pressed(\"ui_accept\") and is_on_floor(): velocity.y = JUMP_VELOCITY
+
+	# Get the input direction and handle the movement/deceleration.
+	# As good practice, you should replace UI actions with custom gameplay actions.
+	var input_dir := Input.get_vector(\"ui_left\", \"ui_right\", \"ui_up\", \"ui_down\")
+	var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+	
+	if direction:
+		velocity.x = direction.x * SPEED
+		velocity.z = direction.z * SPEED
+	else:
+		velocity.x = move_toward(velocity.x, 0, SPEED)
+		velocity.z = move_toward(velocity.z, 0, SPEED)
+
+	move_and_slide()
+
+func _unhandled_input(event: InputEvent) -> void:
+	if !is_multiplayer_authority(): return
+	if event is InputEventMouseMotion: 
+		rotation.y -= event.relative.x * 0.001 * sensibility
+		rotation.x -= event.relative.y * 0.001 * sensibility
+"
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_u8vuu"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_3vyb7"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_u8vuu"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+
+[node name="CharacterBody3D" type="CharacterBody3D" unique_id=481094081]
+script = SubResource("GDScript_u8vuu")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=191397053]
+mesh = SubResource("CapsuleMesh_u8vuu")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1756548135]
+shape = SubResource("CapsuleShape3D_3vyb7")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=793076811]
+replication_config = SubResource("SceneReplicationConfig_u8vuu")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1923879793]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.61998224, -0.060708642)
